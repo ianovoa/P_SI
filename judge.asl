@@ -6,6 +6,9 @@ contador(100).
 
 size(10).
 
+vecesNoTurno(player1,0).
+vecesNoTurno(player2,0).
+
 actual(player1).
 
 valido(X1,Y1,X2,Y2):-
@@ -31,45 +34,69 @@ negativo(X):- X < 0.
 +!startGame : actual(Player) & contador(N) & N>0 <-
 	.send(Player,tell,puedesmover);
 	.send(Player,untell,puedesmover).
-	
-+moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)] : actual(A) & Dir="up" <-
-	mueve(F,pos(X1,Y1),pos(X2,Y2)).
 
-+mueve(F,pos(X1,Y1),pos(X2,Y2))[source(A)] : actual(A) & valido(X1,Y1,X2,Y2) <- 
-	-mueve(F,pos(X1,Y1),pos(X2,Y2))[source(A)];
++moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)] : not actual(A) <-
+	+noTurno(A).
+	
++moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)] : actual(A) & vecesNoTurno(A,N) & N>=3 <-
+
++moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)] : actual(A) <-
+	if(Dir=="up"){
+		+mueve(pos(X,Y),pos(X,Y-1),A);
+	}
+	if(Dir=="down"){
+		+mueve(pos(X,Y),pos(X,Y+1),A);
+	}
+	if(Dir=="left"){
+		+mueve(pos(X,Y),pos(X-1,Y),A);
+	}
+	if(Dir=="right"){
+		+mueve(pos(X,Y),pos(X+1,Y),A);
+	}
+	else{
+		.print("Direccion de movimiento indeterminada");
+	}.
+
++mueve(pos(X1,Y1),pos(X2,Y2),A) : valido(X1,Y1,X2,Y2) <- 
+	-mueve(pos(X1,Y1),pos(X2,Y2),A);
+	?contador(N);
 	
 	.print("Acabo de verificar el movimiento jugador: ",A);
 	.send(A,tell,valido);
+	
+	-+contador(N-1);
+	-+vecesInvalido(A,0);
+	
 	if (A = player1) 
 		{-+actual(player2);} 
 	else 
 		{-+actual(player1);};
 	.send(A,untell,valido);
 	!startGame.
+
++mueve(pos(X1,Y1),pos(X2,Y2),A) : fueratablero(X1,Y1,X2,Y2) <-
+	-mueve(pos(X1,Y1),pos(X2,Y2),A);
+	?vecesInvalido(A,N);
 	
-	
-+mueve(F,pos(X1,Y1),pos(X2,Y2))[source(A)] : actual(A) & mismapos(X1,Y1,X2,Y2) <-
-//+mueve(F,pos(X,Y),pos(X,Y))[source(A)] : actual(A) <-//& mismapos(X1,Y1,X2,Y2) <-
-	-mueve(F,pos(X1,Y1),pos(X2,Y2))[source(A)];
-	//-mueve(F,pos(X,Y),pos(X,Y))[source(A)];
-	.print("Jugador: ", A, " Acabo de comprobar que es la misma posicion");
-	.send(A,tell,invalido(mismapos));
-	.send(A,untell,invalido(mismapos)).
+	if(N<3){
+		-+vecesInvalido(A,N+1);
+		.print("Jugador: ", A, " Acabo de comprobar que hay una posición fuera del tablero");
+		.send(A,tell,invalido(fueratablero));
+		.send(A,untell,invalido(fueratablero));
+	}
+	else{
+		-+vecesInvalido(A,0);
+		if (A = player1) 
+			{-+actual(player2);} 
+		else 
+			{-+actual(player1);};
+		!startGame;
+	}.
 
-+mueve(F,pos(X1,Y1),pos(X2,Y2))[source(A)] : actual(A) & fueratablero(X1,Y1,X2,Y2) <-
-	-mueve(F,pos(X1,Y1),pos(X2,Y2))[source(A)];
-	.print("Jugador: ", A, " Acabo de comprobar que hay una posición fuera del tablero");
-	.send(A,tell,invalido(fueratablero));
-	.send(A,untell,invalido(fueratablero)).
-
-+mueve(F,P1,P2)[source(A)] : not actual (A)<-
-	-mueve(F,P1,P2)[source(A)];
-	.print("Movimiento no experado del jugador: ",A).
-
-+mueve(F,P1,P2)[source(A)] : actual (A)<-
-	-mueve(F,P1,P2)[source(A)];
++mueve(P1,P2)[source(A)] : actual (A)<-
+	-mueve(P1,P2)[source(A)];
 	.print("Movimiento no controlado del jugador: ",A).
 	
-+mueve(F,P1,P2)<-
-	-mueve(F,P1,P2);
++mueve(P1,P2)<-
+	-mueve(P1,P2);
 	.print("Movimiento indeterminado").
