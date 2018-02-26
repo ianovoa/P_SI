@@ -46,4 +46,11 @@ invalidoC(pos(3,2),pos(3,2)).
 	.send(judge,tell,mueve(ficha,P1,P2)).
 +invalido(fueratablero)[source(judge)].
 
+//Nuevo
++invalido(fueraturno)[source(judge)] : invalidoB(P1,P2) <-
+	//-invalido(fueratablero);
+	.print("Acabo de recibir del juez que he perdido el turno");
+	-invalidoB(P1,P2);
+	.send(judge,tell,contador(0)).
+
 +valido[source(judge)] <- .print("Mi movimiento ha sido aceptado por el jueZ.").
