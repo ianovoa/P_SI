@@ -39,6 +39,10 @@ negativo(X):- X < 0.
 	+noTurno(A).
 	
 +moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)] : actual(A) & vecesNoTurno(A,N) & N>=3 <-
+	?contador(N);
+	
+	.print("El jugador ",A," tiene prohibido seguir jugando");
+	-+contador(N-1).
 
 +moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)] : actual(A) <-
 	if(Dir=="up"){
