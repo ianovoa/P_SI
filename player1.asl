@@ -31,10 +31,15 @@ invalidoC(pos(2,3),pos(2,3)).
 
 /* Plans */
 
-+puedesmover[source(judge)] : invalidoC(P1,P2) <- 
++puedesmover[source(judge)] : true <-
+	.print("Acabo de recibir del juez el testigo de mover");
+	.send(judge,tell,moverDesdeEnDireccion(pos(1,1),"left")).
+
+/*+puedesmover[source(judge)] : invalidoC(P1,P2) <- 
 	.print("Acabo de recibir del juez el testigo de mover");
 	-invalidoC(P1,P2);
-	.send(judge,tell,mueve(ficha,P1,P2)).
+	//.send(judge,tell,mueve(ficha,P1,P2)).
+	send(judge,tell,moverDesdeEnDireccion(pos(X,Y),Dir)).
 	
 +puedesmover[source(judge)] : not invalidoC(P1,P2) <- 
 	.print("Acabo de recibir nuevamente del juez el testigo de mover");
@@ -65,14 +70,8 @@ invalidoC(pos(2,3),pos(2,3)).
 	.print("Acabo de recibir del juez que he intentado mover fuera del tablero 2 veces");
 	//-valido(P1,P2);
 	.send(judge,tell,mueve(ficha,P1,P2)).
-//Nuevo
-+invalido(fueraturno)[source(judge)] : invalidoB(P1,P2) <-
-	//-invalido(fueratablero);
-	.print("Acabo de recibir del juez que he perdido el turno");
-	-invalidoB(P1,P2);
-	.send(judge,tell,contador(0)).		
 	
 +invalido(fueratablero)[source(judge)].
 
-+valido[source(judge)] <- .print("Mi ultimo movimiento ha sido valido").
++valido[source(judge)] <- .print("Mi ultimo movimiento ha sido valido").*/
 
