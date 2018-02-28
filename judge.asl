@@ -83,18 +83,30 @@ random(X,Max):-
 +mueve(pos(X1,Y1),pos(X2,Y2),A) : valido(X1,Y1,X2,Y2) <- 
 	-mueve(pos(X1,Y1),pos(X2,Y2),A);
 	?contador(N);
+	?celda(ficha(Color1,Tipo1),pos(X1,Y1),_);
+	?celda(ficha(Color2,Tipo2),pos(X2,Y2),_);
 	
-	.print("El jugador ",A," a movido de (",X1,",",Y1,") a (",X2,",",Y2,")");
-	.send(A,tell,valido);
-	.send(A,untell,valido);
-	
-	-+contador(N-1);
-	-+vecesInvalido(A,0);
-	
-	if (A = player1) 
-		{-+actual(player2);} 
-	else 
-		{-+actual(player1);};
+	if(Color1 == Color2){
+		.print("El jugador ",A," a intercambiado dos fichas con el mismo color");
+		.send(A,tell,tryAgain);
+		.send(A,untell,tryAgain);
+	}
+	else{
+		-+celda(ficha(Color2,Tipo2),pos(X1,Y1),_);
+		-+celda(ficha(Color1,Tipo1),pos(X2,Y2),_);
+		
+		.print("El jugador ",A," a movido de (",X1,",",Y1,") a (",X2,",",Y2,")");
+		.send(A,tell,valido);
+		.send(A,untell,valido);
+		
+		-+contador(N-1);
+		-+vecesInvalido(A,0);
+		
+		if (A = player1) 
+			{-+actual(player2);} 
+		else 
+			{-+actual(player1);};
+	}
 	!startGame.
 
 +mueve(pos(X1,Y1),pos(X2,Y2),A) : fueratablero(X1,Y1,X2,Y2) <-
