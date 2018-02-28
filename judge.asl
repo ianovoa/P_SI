@@ -92,8 +92,10 @@ random(X,Max):-
 		.send(A,untell,tryAgain);
 	}
 	else{
-		-+celda(ficha(Color2,Tipo2),pos(X1,Y1),_);
-		-+celda(ficha(Color1,Tipo1),pos(X2,Y2),_);
+		-celda(ficha(Color1,Tipo1),pos(X1,Y1),_);
+		-celda(ficha(Color2,Tipo2),pos(X2,Y2),_);
+		+celda(ficha(Color2,Tipo2),pos(X1,Y1),_);
+		+celda(ficha(Color1,Tipo1),pos(X2,Y2),_);
 		
 		.print("El jugador ",A," a movido de (",X1,",",Y1,") a (",X2,",",Y2,")");
 		.send(A,tell,valido);
