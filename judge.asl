@@ -2,8 +2,7 @@
 
 /* Initial beliefs and rules */
 
-//tablero(celda(Ficha,X,Y))
-//ficha(Color,Tipo)
+//tablero(celda(ficha(Color,Tipo),pos(X,Y))).
 
 contador(100).
 
@@ -17,11 +16,7 @@ vecesInvalido(player2,0).
 
 actual(player1).
 
-valido(X1,Y1,X2,Y2):-
-	not mismapos(X1,Y1,X2,Y2) &
-	not fueratablero(X1,Y1,X2,Y2).
-
-mismapos(X,Y,X,Y).
+valido(X1,Y1,X2,Y2):- not fueratablero(X1,Y1,X2,Y2).
 
 fueratablero(X1,Y1,X2,Y2):-
 	negativo(X1) | negativo(X2) | negativo(Y1) | negativo(Y2).
@@ -31,6 +26,11 @@ fueratablero(X1,Y1,X2,Y2):-
 
 negativo(X):- X < 0.
 
+random(X,Max):-
+	.random(X1) &
+	X = math.round(Max*X1).
+	
+
 /* Initial goals */
 
 !startGame.
@@ -38,22 +38,21 @@ negativo(X):- X < 0.
 /* Plans */
 
 +!startGame : contador(N) & N<=0 <-
-	.print("Fin de la partida").
+	.print("Fin de partida").
 
 +!startGame : actual(Player) & contador(N) & N>0 <-
+	if(N==100){+rellenarTablero;}
 	.send(Player,tell,puedesmover);
 	.send(Player,untell,puedesmover).
 
 +moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)] : not actual(A) <-
 	-moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)];
 	?vecesNoTurno(A,N);
-
 	-+vecesNoTurno(A,N+1).
 	
 +moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)] : actual(A) & vecesNoTurno(A,N) & N>=3 <-
 	-moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)];
 	?contador(N);
-	
 	.print("El jugador ",A," tiene prohibido seguir jugando");
 	-+contador(N-1).
 
@@ -96,7 +95,6 @@ negativo(X):- X < 0.
 		{-+actual(player2);} 
 	else 
 		{-+actual(player1);};
-	.send(A,untell,valido);
 	!startGame.
 
 +mueve(pos(X1,Y1),pos(X2,Y2),A) : fueratablero(X1,Y1,X2,Y2) <-
@@ -106,12 +104,12 @@ negativo(X):- X < 0.
 	if(N<3){
 		-+vecesInvalido(A,N+1);
 		.print("Jugador: ", A, " Acabo de comprobar que hay una posicion fuera del tablero");
-		.send(A,tell,invalido(fueratablero));
-		.send(A,untell,invalido(fueratablero));
+		.send(A,tell,invalido);
+		.send(A,untell,invalido);
 	}
 	else{
-		.print("Jugador ", A, " se detecto 3 fueras de tablero seguidos.");
 		-+vecesInvalido(A,0);
+		.print("Jugador ", A, " se detecto 3 fueras de tablero seguidos.");
 		if (A = player1) 
 			{-+actual(player2);} 
 		else 
@@ -126,3 +124,30 @@ negativo(X):- X < 0.
 +mueve(P1,P2)<-
 	-mueve(P1,P2);
 	.print("Movimiento indeterminado").
+	
++rellenarTablero : true <-
+	?size(N);
+
+	for (.range(I,0,N-1) ) {
+		for (.range(J,0,N-1) ) {
+			?random(Color,5);
+			?random(NTipo,4);
+	
+			if(NTipo==0){
+				Tipo="in";
+			}
+			if(NTipo==1){
+				Tipo="ip";
+			}
+			if(NTipo==2){
+				Tipo="ct";
+			}
+			if(NTipo==3){
+				Tipo="gs";
+			}
+			if(NTipo==4){
+				Tipo="co";
+			}
+			+celda(ficha(Color,Tipo),pos(I,J),0);
+		}
+	}.

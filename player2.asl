@@ -25,17 +25,18 @@ invalidoC(pos(3,2),pos(3,2)).
 
 +puedesmover[source(judge)] : true <-
 	.print("Acabo de recibir del juez el testigo de mover");
-	.send(judge,tell,moverDesdeEnDireccion(pos(1,1),"left")).
+	.send(judge,tell,moverDesdeEnDireccion(pos(1,61),"left")).
+	
++invalido[source(judge)] : true <-
+	.print("Acabo de recibir del juez que he intentado mover fuera del tablero");
+	.send(judge,tell,moverDesdeEnDireccion(pos(1,61),"left")).
 
 /*+puedesmover[source(judge)] : invalidoC(P1,P2) <- 
 	.print("Acabo de recibir del juez el testigo de mover");
 	-invalidoC(P1,P2);
 	.send(judge,tell,mueve(ficha,P1,P2)).
 	
-+invalido(mismapos)[source(judge)] : invalidoA(P1,P2) <-
-	.print("Acabo de recibir del juez que he intentado mover la misma ficha");
-	-invalidoA(P1,P2);
-	.send(judge,tell,mueve(ficha,P1,P2)).
+
 +invalido(mismapos)[source(judge)].
 
 +invalido(fueratablero)[source(judge)] : invalidoB(P1,P2) <-
