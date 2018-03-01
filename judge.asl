@@ -85,8 +85,8 @@ random(X,Max):-
 +mueve(pos(X1,Y1),pos(X2,Y2),A) : valido(X1,Y1,X2,Y2) <- 
 	-mueve(pos(X1,Y1),pos(X2,Y2),A);
 	?contador(N);
-	?celda(ficha(Color1,Tipo1),pos(X1,Y1),_);
-	?celda(ficha(Color2,Tipo2),pos(X2,Y2),_);
+	?posTablero(celda(X1,Y1,Own1),ficha(Color1,Tipo1));
+	?posTablero(celda(X2,Y2,Own2),ficha(Color2,Tipo2));
 	
 	if(Color1 == Color2){
 		.print("El jugador ",A," a intercambiado dos fichas con el mismo color");
@@ -94,17 +94,18 @@ random(X,Max):-
 		.send(A,untell,tryAgain);
 	}
 	else{
-		-celda(ficha(Color1,Tipo1),pos(X1,Y1),_);
-		-celda(ficha(Color2,Tipo2),pos(X2,Y2),_);
-		+celda(ficha(Color2,Tipo2),pos(X1,Y1),_);
-		+celda(ficha(Color1,Tipo1),pos(X2,Y2),_);
+		-posTablero(celda(X1,Y1,_),ficha(Color1,Tipo1));
+		-posTablero(celda(X2,Y2,_),ficha(Color2,Tipo2));
+		+posTablero(celda(X1,Y1,Own1),ficha(Color2,Tipo2));
+		+posTablero(celda(X2,Y2,Own2),ficha(Color1,Tipo1));
 		
 		.print("El jugador ",A," a movido de (",X1,",",Y1,") a (",X2,",",Y2,")");
 		.send(A,tell,valido);
 		.send(A,untell,valido);
 		
 		-+contador(N-1);
-		-+vecesInvalido(A,0);
+		-vecesInvalido(A,_);
+		+vecesInvalido(A,0);
 		
 		if (A = player1) 
 			{-+actual(player2);} 
@@ -118,14 +119,16 @@ random(X,Max):-
 	?vecesInvalido(A,N);
 	
 	if(N<3){
-		J=N+1
+		J=N+1;
 		-+vecesInvalido(A,N+1);
 		.print("Jugador: ", A, " Acabo de comprobar que hay una posicion fuera del tablero");
 		.send(A,tell,invalido(fueraTablero,J));
 		.send(A,untell,invalido(fueraTablero,J));
 	}
 	else{
-		-+vecesInvalido(A,0);
+		-vecesInvalido(A,N);
+		+vecesInvalido(A,0);
+		
 		.print("Jugador ", A, " se detecto 3 fueras de tablero seguidos.");
 		if (A = player1) 
 			{-+actual(player2);} 
@@ -165,6 +168,6 @@ random(X,Max):-
 			if(NTipo==4){
 				Tipo="co";
 			}
-			+celda(ficha(Color,Tipo),pos(I,J),0);
+			+posTablero(celda(I,J,0),ficha(Color,Tipo));
 		}
 	}.
