@@ -4,6 +4,10 @@
 
 /* Initial beliefs and rules */
 
+random(X,Max):-
+	.random(X1) &
+	X = math.round(Max*X1).
+
 valido(pos(X1,Y1),pos(X2,Y2)):-
 	.random(X11,10) &
 	.random(Y11,10) &
