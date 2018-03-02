@@ -1,7 +1,5 @@
 // Agent tom in project saludos.mas2j
 
-
-
 /* Initial beliefs and rules */
 
 random(X,Max):-
@@ -10,27 +8,51 @@ random(X,Max):-
 
 /* Initial goals */
 
-
-
 //!start.
-
-
 
 /* Plans */
 
 +puedesmover[source(judge)] : true <-
 	?random(X,9);
 	?random(Y,9);
+	?random(Z,3);
+	
+	if(Z==0){
+		Dir="up";
+	}
+	if(Z==1){
+		Dir="down";
+	}
+	if(Z==2){
+		Dir="left";
+	}
+	if(Z==3){
+		Dir="right";
+	}
 	
 	.print("Acabo de recibir del juez el testigo de mover");
-	.send(judge,tell,moverDesdeEnDireccion(pos(X,Y),"right")).
+	.send(judge,tell,moverDesdeEnDireccion(pos(X,Y),Dir)).
 	
 +invalido(fueraTablero,N)[source(judge)] : true <-
 	?random(X,9);
 	?random(Y,9);
+	?random(Z,3);
 	
-	.print("Acabo de recibir del juez que he intentado mover fuera del tablero por ",N,"º vez");
-	.send(judge,tell,moverDesdeEnDireccion(pos(X,Y),"right")).
+	if(Z==0){
+		Dir="up";
+	}
+	if(Z==1){
+		Dir="down";
+	}
+	if(Z==2){
+		Dir="left";
+	}
+	if(Z==3){
+		Dir="right";
+	}
+	
+	.print("Acabo de recibir del juez el testigo de mover");
+	.send(judge,tell,moverDesdeEnDireccion(pos(X,Y),Dir)).
 	
 +valido[source(judge)] <- .print("Mi ultimo movimiento ha sido valido").
 
