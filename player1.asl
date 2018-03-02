@@ -8,23 +8,6 @@ random(X,Max):-
 	.random(X1) &
 	X = math.round(Max*X1).
 
-valido(pos(X1,Y1),pos(X2,Y2)):-
-	.random(X11,10) &
-	.random(Y11,10) &
-	.random(X12,10) &
-	.random(Y12,10) &
-	X1 = math.round(10*X11) &
-	Y1 = math.round(10*Y11) &
-	X2 = math.round(10*X12) &
-	Y2 = math.round(10*Y12).
-
-invalidoA(pos(3,-4),pos(4,5)).
-
-invalidoB(pos(3,1000), pos(4,5)).
-
-invalidoC(pos(2,3),pos(2,3)).
-
-
 /* Initial goals */
 
 
@@ -36,46 +19,21 @@ invalidoC(pos(2,3),pos(2,3)).
 /* Plans */
 
 +puedesmover[source(judge)] : true <-
+	?random(X,9);
+	?random(Y,9);
+	
 	.print("Acabo de recibir del juez el testigo de mover");
-	.send(judge,tell,moverDesdeEnDireccion(pos(1,1),"left")).
+	.send(judge,tell,moverDesdeEnDireccion(pos(X,Y),"right")).
+	
++invalido(fueraTablero,N)[source(judge)] : true <-
+	?random(X,9);
+	?random(Y,9);
+	
+	.print("Acabo de recibir del juez que he intentado mover fuera del tablero por ",N,"º vez");
+	.send(judge,tell,moverDesdeEnDireccion(pos(X,Y),"right")).
+	
++valido[source(judge)] <- .print("Mi ultimo movimiento ha sido valido").
 
-/*+puedesmover[source(judge)] : invalidoC(P1,P2) <- 
-	.print("Acabo de recibir del juez el testigo de mover");
-	-invalidoC(P1,P2);
-	//.send(judge,tell,mueve(ficha,P1,P2)).
-	send(judge,tell,moverDesdeEnDireccion(pos(X,Y),Dir)).
-	
-+puedesmover[source(judge)] : not invalidoC(P1,P2) <- 
-	.print("Acabo de recibir nuevamente del juez el testigo de mover");
-	.print("Procedo a actualizar los conocimientos sobre movimientos");
-	+invalidoA(pos(-3,4),pos(5,4));
-	+invalidoB(pos(1000,3), pos(5,4));
-	+invalidoC(pos(3,2),pos(3,2));
-	P1 = pos(3,2);
-	P2 = pos(3,2);
-	-invalidoC(pos(3,2),pos(3,2));
-	.send(judge,tell,mueve(ficha,P1,P2)).
-	
-+invalido(mismapos)[source(judge)] : invalidoA(P1,P2) <-
-	.print("Acabo de recibir del juez que he intentado mover la misma ficha");
-	-invalidoA(P1,P2);
-	.send(judge,tell,mueve(ficha,P1,P2)).
-	
-+invalido(mismapos)[source(judge)].
++tryAgain[source(judge)] <- .print("Mi ultimo movimiento ha tocado 2 fichas del mismo color").
 
-+invalido(fueratablero)[source(judge)] : invalidoB(P1,P2) <-
-	//-invalido(fueratablero);
-	.print("Acabo de recibir del juez que he intentado mover fuera del tablero 1 vez");
-	-invalidoB(P1,P2);
-	.send(judge,tell,mueve(ficha,P1,P2)).
-	
-+invalido(fueratablero)[source(judge)] : valido(P1,P2) <-
-	//-invalido(fueratablero);
-	.print("Acabo de recibir del juez que he intentado mover fuera del tablero 2 veces");
-	//-valido(P1,P2);
-	.send(judge,tell,mueve(ficha,P1,P2)).
-	
-+invalido(fueratablero)[source(judge)].
-
-+valido[source(judge)] <- .print("Mi ultimo movimiento ha sido valido").*/
-
++invalido(fueraTurno,N)[source(judge)] <- .print("He intentado hacer trampa moviendo fuera de mi turno").

@@ -4,14 +4,9 @@
 
 /* Initial beliefs and rules */
 
-valido(pos(4,3),pos(5,4)).
-
-invalidoA(pos(-3,4),pos(4,5)).
-
-invalidoB(pos(1000,3), pos(4,5)).
-
-invalidoC(pos(3,2),pos(3,2)).
-
+random(X,Max):-
+	.random(X1) &
+	X = math.round(Max*X1).
 
 /* Initial goals */
 
@@ -24,31 +19,21 @@ invalidoC(pos(3,2),pos(3,2)).
 /* Plans */
 
 +puedesmover[source(judge)] : true <-
+	?random(X,9);
+	?random(Y,9);
+	
 	.print("Acabo de recibir del juez el testigo de mover");
-	.send(judge,tell,moverDesdeEnDireccion(pos(1,61),"left")).
+	.send(judge,tell,moverDesdeEnDireccion(pos(X,Y),"right")).
 	
 +invalido(fueraTablero,N)[source(judge)] : true <-
-	.print("Acabo de recibir del juez que he intentado mover fuera del tablero");
-	.send(judge,tell,moverDesdeEnDireccion(pos(1,61),"left")).
-
-/*+puedesmover[source(judge)] : invalidoC(P1,P2) <- 
-	.print("Acabo de recibir del juez el testigo de mover");
-	-invalidoC(P1,P2);
-	.send(judge,tell,mueve(ficha,P1,P2)).
+	?random(X,9);
+	?random(Y,9);
 	
+	.print("Acabo de recibir del juez que he intentado mover fuera del tablero por ",N,"º vez");
+	.send(judge,tell,moverDesdeEnDireccion(pos(X,Y),"right")).
+	
++valido[source(judge)] <- .print("Mi ultimo movimiento ha sido valido").
 
-+invalido(mismapos)[source(judge)].
++tryAgain[source(judge)] <- .print("Mi ultimo movimiento ha tocado 2 fichas del mismo color").
 
-+invalido(fueratablero)[source(judge)] : invalidoB(P1,P2) <-
-	//-invalido(fueratablero);
-	.print("Acabo de recibir del juez que he intentado mover fuera del tablero");
-	-invalidoB(P1,P2);
-	.send(judge,tell,mueve(ficha,P1,P2)).
-+invalido(fueratablero)[source(judge)] : valido(P1,P2) <-
-	//-invalido(fueratablero);
-	.print("Acabo de recibir del juez que he intentado mover fuera del tablero");
-	-valido(P1,P2);
-	.send(judge,tell,mueve(ficha,P1,P2)).
-+invalido(fueratablero)[source(judge)].
-
-+valido[source(judge)] <- .print("Mi movimiento ha sido aceptado por el jueZ.").*/
++invalido(fueraTurno,N)[source(judge)] <- .print("He intentado hacer trampa moviendo fuera de mi turno").

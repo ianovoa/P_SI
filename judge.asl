@@ -48,9 +48,10 @@ random(X,Max):-
 +moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)] : not actual(A) <-
 	-moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)];
 	?vecesNoTurno(A,N);
-	.send(A,tell,invalido(fueraTablero,N+1));
-	.send(A,untell,invalido(fueraTablero,N+1));
-	-+vecesNoTurno(A,N+1).
+	.send(A,tell,invalido(fueraTurno,N+1));
+	.send(A,untell,invalido(fueraTurno,N+1));
+	-vecesNoTurno(A,_);
+	+vecesNoTurno(A,N+1).
 	
 +moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)] : actual(A) & vecesNoTurno(A,N) & N>=3 <-
 	-moverDesdeEnDireccion(pos(X,Y),Dir)[source(A)];
@@ -120,13 +121,14 @@ random(X,Max):-
 	
 	if(N<3){
 		J=N+1;
-		-+vecesInvalido(A,N+1);
+		-vecesInvalido(A,_);
+		+vecesInvalido(A,N+1);
 		.print("Jugador: ", A, " Acabo de comprobar que hay una posicion fuera del tablero");
 		.send(A,tell,invalido(fueraTablero,J));
 		.send(A,untell,invalido(fueraTablero,J));
 	}
 	else{
-		-vecesInvalido(A,N);
+		-vecesInvalido(A,_);
 		+vecesInvalido(A,0);
 		
 		.print("Jugador ", A, " se detecto 3 fueras de tablero seguidos.");
